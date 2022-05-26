@@ -58,6 +58,7 @@ def render_count(number, offset):
 			frame[:,hor_offset:hor_offset + digit_width] \
 					= number_imgs[num_list[i]][:,:]
 
+	show_img(frame)
 	return frame
 	# exit(0)
 
@@ -98,7 +99,7 @@ for num in range(10):
 	else:
 		img_4ch[:,:,:3] = img[:,:,:]
 	number_imgs.append(img_4ch)
-render_count(3699, 400)
+# render_count(3699, 20)
 
 
 
@@ -107,12 +108,49 @@ replay = Replay.from_path('test replay.osr')
 frame = 0
 cur_ms = 0
 pre_event_ms = 0
+pre_event_bttn = 0
 event_index = 0
-while True:
-	cur_ms = frame/fps*1000
+# while event_index < len(replay.replay_data):
+pre_key = 0
 
-	next_event = replay.replay_data[event_index]
-	print(int(next_event.keys), frame, cur_ms)
+left_count = 0
+right_count = 0
+while event_index < 15:
+	
+	while True:
+		next_event = replay.replay_data[event_index]
+		if replay.replay_data[event_index].time_delta <= 0:
+			event_index += 1
+		else:
+			break
+	cur_ms = frame/fps*1000
+	# print(cur_event, cur_ms - pre_event_ms)
+
+	if cur_event != None:
+		if pre_key != int(cur_event.keys):
+			match int(cur_event.keys):
+				case 5:
+					if pre_key != 15:
+						left_count += 1
+					break
+				case 10:
+					if pre_key != 15:
+						right_count += 1
+					break
+				case 15:
+					match pre_key:
+						case 0:
+							left_count += 1
+							right_count += 1
+							break
+						case 5:
+							right_count += 1
+							break
+						case 10:
+							left_count += 1
+							break
+					break
+
 	if pre_event_ms + next_event.time_delta < cur_ms:
 		event_index += 1
 		pre_event_ms += next_event.time_delta
@@ -120,8 +158,8 @@ while True:
 		# print(cur_ms - pre_event_ms)
 	frame += 1
 
-for replay_event in replay.replay_data:
-	print(int(replay_event.keys))
+# for replay_event in replay.replay_data:
+# 	print(int(replay_event.keys))
 # min_coor = [0, 0]
 # max_coor = [0, 0]
 # for replay_event in replay.replay_data:
